@@ -15,11 +15,11 @@ You first need to create a gemset for your app and use it, as well as install ra
 
 Then install like so:
 
-    `rails new <appname> -m http://github.com/rubyx/rails3_template/raw/master/init.rb`
+    rails new <appname> -m http://github.com/rubyx/rails3_template/raw/master/init.rb
 
 You can install in an existing app if you wish:
 
-    `rake rails:template LOCATION=http://github.com/rubyx/rails3_template/raw/master/init.rb`
+    rake rails:template LOCATION=http://github.com/rubyx/rails3_template/raw/master/init.rb
 
 
 Process

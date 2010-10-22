@@ -32,6 +32,11 @@ END
 
 # Remove unnecessary Rails files
 run 'rm README'
+
+file "README.md", <<-END
+Readme for #{app_name}
+END
+
 run 'rm public/index.html'
 run 'rm public/favicon.ico'
 run 'rm public/images/rails.png'

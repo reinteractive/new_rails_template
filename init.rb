@@ -164,7 +164,7 @@ jQuery(function ($) {
 END
 
 # Override javascript_link_tag :defaults
-environment "  config.action_view.javascript_expansions[:defaults] = ['jquery', 'rails', 'application']"
+environment "  config.action_view.javascript_expansions[:defaults] = ['jquery', 'rails']"
 
 git :add => "."
 git :commit => "-a -m 'Installed JQuery'"
@@ -181,7 +181,7 @@ run 'mkdir public/stylesheets/sass'
 run 'touch public/stylesheets/sass/ui.layout.scss'
 
 # Override stylesheet_link_tag :defaults
-environment "config.action_view.stylesheet_expansions[:defaults] = ['reset' 'ui.layout']"
+environment "  config.action_view.stylesheet_expansions[:defaults] = ['reset', 'ui.layout']"
 
 # HAML & Sass config initializer
 initializer('sass.rb') do
@@ -198,7 +198,7 @@ END
 end
 
 
-initializer('sass.rb') do
+initializer('haml.rb') do
 <<-END
 # HAML config
 
@@ -272,6 +272,10 @@ git :commit => "-a -m 'Installed RSpec, Cucumber and Machinist'"
 generate 'controller', 'home'
 route("root :to => 'home#index'")
 
+file 'app/views/home/index.haml', <<-END
+%h1 Home
+END
+
 git :add => "."
 git :commit => "-a -m 'Setup home controller and mapped root'"
 
@@ -289,7 +293,7 @@ git :commit => "-a -m 'Installed Simple Form'"
 
 # Setup Devise
 generate "devise:install"
-model_name = ask("What model name should devise use? (e.g. User)?")
+model_name = ask("What model name should devise use? (default: user)?")
 model_name = 'user' if model_name.blank?
 generate "devise", model_name
 generate 'devise:views'
@@ -339,8 +343,9 @@ end
 
 # Setup TellThemWhen site support
 if ask("Add TellThemWhen Site Notification code to layout? (N/y)").upcase == 'Y'
-  tellthemwhenkey = ask("Please provide your TellThemWhen tracking key: (e.g )")
+  tellthemwhenkey = ask("Please provide your TellThemWhen tracking key: (e.g 1a2b3c4d5e6f)")
 file "app/views/shared/_tellthemwhen.haml", <<-LOL
+#TTWNotify{ :style=>"display:hidden" }
 :javascript
   (function(){
     t = document.createElement('script');t.async=true;t.type ='text/javascript';
@@ -350,7 +355,6 @@ file "app/views/shared/_tellthemwhen.haml", <<-LOL
 LOL
 
 append_file "app/views/layouts/application.haml", <<-LOL
-    #TTWNotify { :style=>"display:hidden" }
     = render :partial => 'shared/tellthemwhen'
 LOL
   git :add => "."

@@ -1,5 +1,23 @@
 # RubyX Standard Init Script for Rails 3
 
+instructions =<<-END
+
+Running the RubyX Standard Init Script for Rails 3
+--------------------------------------------------
+
+During installation you will be asked for a number
+of credentials for different services, these are 
+entirely optional however you might like to gather 
+these now.
+
+- Hoptoad API key
+- Google Analytics tracking code e.g UA-XXXXXX-XX
+  This can be found on your Google Analytics settings page.
+
+--------------------------------------------------
+END
+say(instructions)
+
 run 'rm Gemfile'
 
 file "Gemfile", <<-END
@@ -157,7 +175,7 @@ git :add => "."
 git :commit => "-a -m 'Setup devise'"
 
 # Setup HopToad
-if ask("Setup Hoptoad?")
+if ask("Setup Hoptoad? (N/y)")
   hop_toad_key = ask("Please provide HopToad API Key:")
   generate "hoptoad", "--api-key #{hop_toad_key}"
 end
@@ -202,7 +220,7 @@ LOL
 git :add => "."
 git :commit => "-am 'Replaced application layout with Haml, including javascripts and default styles'"
 
-if ask("Add Google Analytics tracking to layout?")
+if ask("Add Google Analytics tracking to layout? (N/y)")
   ga_key = ask("Please provide your Google Analytics tracking key: (e.g UA-XXXXXX-XX)")
 file "app/views/shared/_google_analytics.haml", <<-LOL
 :javascript

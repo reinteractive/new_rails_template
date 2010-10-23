@@ -21,8 +21,8 @@ This initialisation script assumes a few things:
 Pre Initialisation Setup with RVM
 ---------------------------------
 
-First off, if you are using RVM, make sure you have bundler installed in your global
-gemset, this saves installing it every single time:
+All RubyX app is developed using RVM and app specific Gemsets, so you need make sure you have bundler
+installed in your global gemset, this saves installing it every single time:
 
     rvm gemset use 'global'
     gem install bundler

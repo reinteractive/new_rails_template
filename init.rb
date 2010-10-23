@@ -52,7 +52,7 @@ END
 run 'rm README'
 
 file "README.md", <<-END
-#{app_name}
+#{app_name.titleize}
 ==
 END
 
@@ -166,7 +166,7 @@ git :commit => "-a -m 'Installed Simple Form'"
 
 # Setup Devise
 generate "devise:install"
-model_name = ask("What model name should devise use? (e.g. user)?")
+model_name = ask("What model name should devise use? (e.g. User)?")
 model_name = 'user' if model_name.blank?
 generate "devise", model_name
 generate 'devise:views'
@@ -209,7 +209,7 @@ file "app/views/layouts/application.haml", <<-LOL
 !!!
 %html
   %head
-    %title= @title || "#{app_name.humanize}"
+    %title= @title || "#{app_name.titleize}"
     = stylesheet_link_tag 'reset', 'ui.layout'
     = csrf_meta_tag
   %body

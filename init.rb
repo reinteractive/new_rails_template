@@ -34,7 +34,8 @@ END
 run 'rm README'
 
 file "README.md", <<-END
-Readme for #{app_name}
+#{app_name}
+==
 END
 
 run 'rm public/index.html'
@@ -42,9 +43,12 @@ run 'rm public/favicon.ico'
 run 'rm public/images/rails.png'
 run 'rm -f public/javascripts/*'
 
+# Download reset.css
+get 'http://yui.yahooapis.com/2.8.1/build/reset/reset-min.css', 'public/stylesheets/reset.css'
+
 # Create the SASS directory
 run 'mkdir public/stylesheets/sass'
-run 'touch public/stylesheets/sass/main.scss'
+run 'touch public/stylesheets/sass/ui.layout.scss'
 
 # Downloading latest jQuery.min
 get "http://code.jquery.com/jquery-latest.min.js", "public/javascripts/jquery.js"
@@ -68,6 +72,7 @@ environment "  config.time_zone = 'UTC'"
 append_file ".gitignore", "config/database.yml"
 append_file ".gitignore", "config/.rvmrc"
 append_file ".gitignore", ".rspec"
+append_file ".gitignore", "vendor/bundle"
 
 # Remove default database file
 run 'rm config/database.yml'

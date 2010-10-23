@@ -1,5 +1,7 @@
 # RubyX Standard Init Script for Rails 3
 
+RailsVersion = "3.0.1"
+
 instructions =<<-END
 
 Running the RubyX Standard Init Script for Rails 3
@@ -13,17 +15,56 @@ these now.
 - Hoptoad API key
 - Google Analytics tracking code e.g UA-XXXXXX-XX
   This can be found on your Google Analytics settings page.
+- TellThemWhen.com Site API key
 
 --------------------------------------------------
 END
 say(instructions)
 
-run 'rm Gemfile'
 
+############################################################
+# Remove unnecessary Rails files and improve gitignore
+#
+
+# ReadME first development :)
+run 'rm README'
+
+file "README.md", <<-END
+#{app_name.titleize}
+===========================
+END
+git :init
+git :add => "README.md"
+git :commit => "-m 'Fix up the README'"
+
+# Improve the Gitignore
+append_file ".gitignore", "config/database.yml"
+append_file ".gitignore", "config/.rvmrc"
+append_file ".gitignore", ".rspec"
+append_file ".gitignore", "vendor/bundle"
+
+git :add => ".gitignore"
+git :commit => "-m 'Ignore what we need to ignore'"
+
+# Remove the other static files
+run 'rm Gemfile'
+run 'rm public/index.html'
+run 'rm public/favicon.ico'
+run 'rm public/images/rails.png'
+run 'rm -f public/javascripts/*'
+
+# Add the base system
+git :add => "."
+git :commit => "-a -m 'Initial commit of clean Rails #{RailsVersion} App'"
+
+
+############################################################
+# Setup Gemfile and RVM
+#
 file "Gemfile", <<-END
 source :rubygems
 
-gem "rails",                  "3.0.1"
+gem "rails",                  "#{RailsVersion}"
 gem "pg",                     "~> 0.9.0"
 gem "haml",                   "~> 3.0.22"
 gem "hoptoad_notifier",       "~> 2.3.8"
@@ -48,49 +89,23 @@ group :test do
 end
 END
 
-# Remove unnecessary Rails files
-run 'rm README'
-
-file "README.md", <<-END
-#{app_name.titleize}
-==
+# Setup RVM RC and trust it
+file ".rvmrc", <<-END
+rvm ruby-1.8.7@#{app_name}
 END
+run "rvm rvmrc trust"
 
-run 'rm public/index.html'
-run 'rm public/favicon.ico'
-run 'rm public/images/rails.png'
-run 'rm -f public/javascripts/*'
+# Bundle install
+run "gem install bundler"
+run "bundle install"
 
-# Download reset.css
-get 'http://yui.yahooapis.com/2.8.1/build/reset/reset-min.css', 'public/stylesheets/reset.css'
+git :add => "."
+git :commit => "-a -m 'Gemset created and bundle installed'"
 
-# Create the SASS directory
-run 'mkdir public/stylesheets/sass'
-run 'touch public/stylesheets/sass/ui.layout.scss'
 
-# Downloading latest jQuery.min
-get "http://code.jquery.com/jquery-latest.min.js", "public/javascripts/jquery.js"
-
-# Downloading latest jQuery drivers
-get "http://github.com/rails/jquery-ujs/raw/master/src/rails.js", "public/javascripts/rails.js"
-
-# Create a base application.js
-file "public/javascripts/application.js", <<-END
-jQuery(function ($) {
-  /**
-   * App code in here
-   */
-};
-END
-
-environment "  config.action_view.javascript_expansions[:defaults] = %w(jquery rails)"
-environment "  config.time_zone = 'UTC'"
-
-# Clean up the git ignore
-append_file ".gitignore", "config/database.yml"
-append_file ".gitignore", "config/.rvmrc"
-append_file ".gitignore", ".rspec"
-append_file ".gitignore", "vendor/bundle"
+############################################################
+# Database and create
+#
 
 # Remove default database file
 run 'rm config/database.yml'
@@ -117,19 +132,7 @@ cucumber:
   <<: *TEST
 END
 
-# Setup RVM RC
-file ".rvmrc", <<-END
-rvm ruby-1.8.7@#{app_name}
-END
-
-# Use Gemset
-run "rvm rvmrc trust"
-
-# Bundle install
-run "gem install bundler"
-run "bundle install"
-
-run "bundle show"
+environment "  config.time_zone = 'UTC'"
 
 # Make a copy to check in
 run 'cp config/database.yml config/database.example.yml'
@@ -137,25 +140,145 @@ run 'cp config/database.yml config/database.example.yml'
 # Create the DB
 rake("db:create")
 
-git :init
 git :add => "."
-git :commit => "-a -m 'Initial commit of base system'"
+git :commit => "-a -m 'Setup Database'"
 
+
+############################################################
+# Install JQuery
+#
+
+# Downloading latest jQuery.min
+get "http://code.jquery.com/jquery-latest.min.js", "public/javascripts/jquery.js"
+
+# Downloading latest jQuery drivers
+get "http://github.com/rails/jquery-ujs/raw/master/src/rails.js", "public/javascripts/rails.js"
+
+# Create a base application.js
+file "public/javascripts/application.js", <<-END
+jQuery(function ($) {
+  /**
+   * App code in here
+   */
+};
+END
+
+# Override javascript_link_tag :defaults
+environment "  config.action_view.javascript_expansions[:defaults] = ['jquery', 'rails', 'application']"
+
+git :add => "."
+git :commit => "-a -m 'Installed JQuery'"
+
+############################################################
+# Install Reset CSS, SASS and HAML
+#
+
+# Download reset.css
+get 'http://yui.yahooapis.com/2.8.1/build/reset/reset-min.css', 'public/stylesheets/reset.css'
+
+# Create the SASS directory
+run 'mkdir public/stylesheets/sass'
+run 'touch public/stylesheets/sass/ui.layout.scss'
+
+# Override stylesheet_link_tag :defaults
+environment "config.action_view.stylesheet_expansions[:defaults] = ['reset' 'ui.layout']"
+
+# HAML & Sass config initializer
+initializer('sass.rb') do
+<<-END
+# SASS config
+
+# Compress output CSS
+Sass::Plugin.options[:style] = :compressed
+
+# Look in sub folders for Sass files
+Sass::Plugin.options[:template_location] = {}
+Dir.glob("\#\{Rails.root\}/public/stylesheets/**/sass").each { |dir| Sass::Plugin.options[:template_location].merge!({dir => dir.to_s.split('/sass')[0]}) }
+END
+end
+
+
+initializer('sass.rb') do
+<<-END
+# HAML config
+
+# Use HTML5 by default
+Haml::Template.options[:format] = :html5
+END
+end
+
+git :add => "."
+git :commit => "-am 'Installed HAML and Sass configuration'"
+
+# Rewrite application.html.erb to HAML
+run 'rm app/views/layouts/application.html.erb'
+
+file "app/views/layouts/application.haml", <<-END
+!!!
+%html
+  %head
+    %title= @title || "#{app_name.titleize}"
+    = stylesheet_link_tag :defaults
+    = csrf_meta_tag
+  %body
+    = yield
+    
+    = javascript_include_tag :defaults
+    = yield :bottom_javascript
+END
+
+git :add => "."
+git :commit => "-am 'Replaced application layout with Haml, including javascripts and default styles'"
+
+
+
+############################################################
+# Generate RSpec and Cucumber
+#
 
 # Setup RSpec and Cucumber
 generate "rspec:install"
 generate "cucumber:install", "--rspec --capybara"
 
+# Setup Machinist and Faker
+run 'mkdir -p spec/support'
+file 'touch spec/support/blueprints.rb', <<-END
+require 'machinist/active_record'
+require 'faker'
+require 'sham'
+
+Sham.email { Faker::Internet.email }
+Sham.hostname { Faker::Internet.domain_name }
+Sham.name  { Faker::Name.name }
+Sham.text  { Faker::Lorem.sentence }
+
+END
+
+# doing { something }.should change(Something, :count).by(1)
+file 'touch spec/support/custom.rb', <<-END
+alias :doing :lambda
+END
+
 git :add => "."
-git :commit => "-a -m 'Installed RSpec and Cucumber'"
+git :commit => "-a -m 'Installed RSpec, Cucumber and Machinist'"
+
+
+
+############################################################
+# Setup base home controller and my/dashboard
+#
 
 # Setup home and dashboard
 generate 'controller', 'home'
-generate 'controller', 'my/dashboard'
 route("root :to => 'home#index'")
 
 git :add => "."
-git :commit => "-a -m 'Setup home and dashboard controllers'"
+git :commit => "-a -m 'Setup home controller and mapped root'"
+
+
+############################################################
+# Setup Additional Gems
+#
 
 # Setup Simple Form
 generate "simple_form:install"
@@ -174,6 +297,11 @@ generate 'devise:views'
 git :add => "."
 git :commit => "-a -m 'Setup devise'"
 
+
+############################################################
+# Setup Hoptoad and Google Analytics
+#
+
 # Setup HopToad
 if ask("Setup Hoptoad? (N/y)").upcase == 'Y'
   hop_toad_key = ask("Please provide HopToad API Key:")
@@ -184,43 +312,7 @@ else
   say "=> Skipping HopToad setup"
 end
 
-# HAML & Sass config
-file "config/initializers/haml_sass.rb", <<-LOL
-# HAML and Sass config
-
-# Compress output CSS
-Sass::Plugin.options[:style] = :compressed
-
-# Use HTML5 by default
-Haml::Template.options[:format] = :html5
-
-# Look in sub folders for Sass files
-Sass::Plugin.options[:template_location] = {}
-Dir.glob("\#\{Rails.root\}/public/stylesheets/**/sass").each { |dir| Sass::Plugin.options[:template_location].merge!({dir => dir.to_s.split('/sass')[0]}) }
-LOL
-
-git :add => "."
-git :commit => "-am 'Installed HAML and Sass configuration'"
-
-run 'rm app/views/layouts/application.html.erb'
-
-file "app/views/layouts/application.haml", <<-LOL
-!!!
-%html
-  %head
-    %title= @title || "#{app_name.titleize}"
-    = stylesheet_link_tag 'reset', 'ui.layout'
-    = csrf_meta_tag
-  %body
-    = yield
-    
-    = javascript_include_tag :defaults
-    = yield :bottom_javascript
-LOL
-
-git :add => "."
-git :commit => "-am 'Replaced application layout with Haml, including javascripts and default styles'"
-
+# Setup Google Analytics
 if ask("Add Google Analytics tracking to layout? (N/y)").upcase == 'Y'
   ga_key = ask("Please provide your Google Analytics tracking key: (e.g UA-XXXXXX-XX)")
 file "app/views/shared/_google_analytics.haml", <<-LOL
@@ -243,6 +335,28 @@ LOL
   git :commit => "-am 'Added Google Analytics tracking code'"
 else
   say "=> Skipping Google Analytics setup"
+end
+
+# Setup TellThemWhen site support
+if ask("Add TellThemWhen Site Notification code to layout? (N/y)").upcase == 'Y'
+  tellthemwhenkey = ask("Please provide your TellThemWhen tracking key: (e.g )")
+file "app/views/shared/_tellthemwhen.haml", <<-LOL
+:javascript
+  (function(){
+    t = document.createElement('script');t.async=true;t.type ='text/javascript';
+    t.src = ('https:' == document.location.protocol ? 'https://secure.' : 'http://api.') + 'tellthemwhen.com/api/v2/notices/#{tellthemwhenkey}.js';
+    var s=document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(t,s);
+  })();
+LOL
+
+append_file "app/views/layouts/application.haml", <<-LOL
+    #TTWNotify { :style=>"display:hidden" }
+    = render :partial => 'shared/tellthemwhen'
+LOL
+  git :add => "."
+  git :commit => "-am 'Added TellThemWhen Site Notification code'"
+else
+  say "=> Skipping TellThemWhen setup"
 end
 
 

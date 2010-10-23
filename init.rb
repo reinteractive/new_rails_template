@@ -178,12 +178,11 @@ git :commit => "-a -m 'Setup devise'"
 if ask("Setup Hoptoad? (N/y)").upcase == 'Y'
   hop_toad_key = ask("Please provide HopToad API Key:")
   generate "hoptoad", "--api-key #{hop_toad_key}"
+  git :add => "."
+  git :commit => "-a -m 'Installed HopToad'"
 else
   say "=> Skipping HopToad setup"
 end
-
-git :add => "."
-git :commit => "-a -m 'Installed HopToad'"
 
 # HAML & Sass config
 file "config/initializers/haml_sass.rb", <<-LOL

@@ -54,6 +54,10 @@ Installs the following gems for development:
 * faker
 * ruby-debug
 
+Downloads and installs latest YUI reset.css
+
+Creates ui.layout.scss for application styles
+
 Downloads and installs the latest jQuery drivers, rails.js file for jQuery and removes all prototype helpers.
 
 Set up the config/database.yml for this application.
@@ -64,13 +68,17 @@ Init a git repository and do a initial commits for each major step
 
 Sets up Hoptoad using a supplied API key and does initial test.
 
+Sets up Google Analytics using supplied GA Key
+
+Creates application.haml layout containing Google Analytics tracking code, default javascripts included at the bottom, and reset styles.
+
 Creates home and my/dashboard controller
 
 Wires up root to Home
 
 Removes all the prototype and stock rails files out of public
 
-Sets up SASS and creates a watch script in script/
+Sets up SASS and Haml to look in sub directories
 
 Does a full bundle install
 

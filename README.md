@@ -85,6 +85,11 @@ Process
 
 After each major change it does a git commit as well to keep things tidy :)
 
+Credits
+=======
+
+This is created from our work at RubyX, thanks also to Ivan Vanderbyl from Asterism for several patches.
+
 License
 =======
 

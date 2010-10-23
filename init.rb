@@ -165,14 +165,23 @@ end
 git :add => "."
 git :commit => "-a -m 'Installed HopToad'"
 
-file "script/sass-watch.sh", <<-END
-#!/bin/sh
-bundle exec sass --watch public/stylesheets/sass/:public/stylesheets/
-END
-run 'chmod 755 script/sass-watch.sh'
+# HAML & Sass config
+file "config/initializers/haml_sass.rb", <<-LOL
+# HAML and Sass config
+
+# Compress output CSS
+Sass::Plugin.options[:style] = :compressed
+
+# Use HTML5 by default
+Haml::Template.options[:format] = :html5
+
+# Look in sub folders for Sass files
+Sass::Plugin.options[:template_location] = {}
+Dir.glob("#{Rails.root}/public/stylesheets/**/sass").each { |dir| Sass::Plugin.options[:template_location].merge!({dir => dir.to_s.split('/sass')[0]}) }
+LOL
 
 git :add => "."
-git :commit => "-a -m 'Installed sass-watch script'"
+git :commit => "-am 'Installed HAML and Sass configuration'"
 
 instructions =<<-END
 

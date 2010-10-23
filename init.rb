@@ -195,7 +195,7 @@ Haml::Template.options[:format] = :html5
 
 # Look in sub folders for Sass files
 Sass::Plugin.options[:template_location] = {}
-Dir.glob("#{Rails.root}/public/stylesheets/**/sass").each { |dir| Sass::Plugin.options[:template_location].merge!({dir => dir.to_s.split('/sass')[0]}) }
+Dir.glob("\#\{Rails.root\}/public/stylesheets/**/sass").each { |dir| Sass::Plugin.options[:template_location].merge!({dir => dir.to_s.split('/sass')[0]}) }
 LOL
 
 git :add => "."

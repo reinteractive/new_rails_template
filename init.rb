@@ -175,9 +175,11 @@ git :add => "."
 git :commit => "-a -m 'Setup devise'"
 
 # Setup HopToad
-if ask("Setup Hoptoad? (N/y)")
+if ask("Setup Hoptoad? (N/y)").upcase == 'Y'
   hop_toad_key = ask("Please provide HopToad API Key:")
   generate "hoptoad", "--api-key #{hop_toad_key}"
+else
+  say "=> Skipping HopToad setup"
 end
 
 git :add => "."
@@ -220,7 +222,7 @@ LOL
 git :add => "."
 git :commit => "-am 'Replaced application layout with Haml, including javascripts and default styles'"
 
-if ask("Add Google Analytics tracking to layout? (N/y)")
+if ask("Add Google Analytics tracking to layout? (N/y)").upcase == 'Y'
   ga_key = ask("Please provide your Google Analytics tracking key: (e.g UA-XXXXXX-XX)")
 file "app/views/shared/_google_analytics.haml", <<-LOL
 :javascript
@@ -240,6 +242,8 @@ append_file "app/views/layouts/application.haml", <<-LOL
 LOL
   git :add => "."
   git :commit => "-am 'Added Google Analytics tracking code'"
+else
+  say "=> Skipping Google Analytics setup"
 end
 
 

@@ -183,6 +183,48 @@ LOL
 git :add => "."
 git :commit => "-am 'Installed HAML and Sass configuration'"
 
+run 'rm app/views/layouts/application.html.erb'
+
+file "app/views/layouts/application.haml", <<-LOL
+!!!
+%html
+  %head
+    %title= @title || "#{app_name}"
+    = stylesheet_link_tag 'reset', 'ui.layout'
+    = csrf_meta_tag
+  %body
+    = yield
+    
+    = javascript_include_tag :defaults
+    = yield :bottom_javascript
+LOL
+
+git :add => "."
+git :commit => "-am 'Replaced application layout with Haml, including javascripts and default styles'"
+
+if ask("Add Google Analytics tracking to layout?")
+  ga_key = ask("Please provide your Google Analytics tracking key: (e.g UA-XXXXXX-XX)")
+file "app/views/shared/_google_analytics.haml", <<-LOL
+:javascript
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', '#{ga_key}']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+LOL
+
+append_file "app/views/layouts/application.haml", <<-LOL
+    = render :partial => 'shared/google_analytics'
+LOL
+  git :add => "."
+  git :commit => "-am 'Added Google Analytics tracking code'"
+end
+
+
 instructions =<<-END
 
 Rails Template Install Complete
@@ -197,10 +239,6 @@ Also setup actionmailer in your production and development environments.
 
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }  # dev + test
   config.action_mailer.default_url_options = { :host => '#{app_name}.com' } # production
-
-To run the sass watcher, simply run:
-
-  ./script/sass-watch.sh
 
 Then edit the db/migrate/TIMESTAMP_create_#{model_name}.rb file to suit and run
 

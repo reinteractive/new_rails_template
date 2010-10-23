@@ -207,7 +207,7 @@ file "app/views/layouts/application.haml", <<-LOL
 !!!
 %html
   %head
-    %title= @title || "#{app_name}"
+    %title= @title || "#{app_name.humanize}"
     = stylesheet_link_tag 'reset', 'ui.layout'
     = csrf_meta_tag
   %body

@@ -1,5 +1,6 @@
 About
 =====
+
 This is the RubyX Rails 3 Template we use to kick off any new application.
 
 Assumptions

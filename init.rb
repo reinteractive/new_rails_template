@@ -345,7 +345,7 @@ end
 if ask("Add TellThemWhen Site Notification code to layout? (N/y)").upcase == 'Y'
   tellthemwhenkey = ask("Please provide your TellThemWhen tracking key: (e.g 1a2b3c4d5e6f)")
 file "app/views/shared/_tellthemwhen.haml", <<-LOL
-#TTWNotify{ :style=>"display:hidden" }
+#TTWNotify{:style=>"display:none"}
 :javascript
   (function(){
     t = document.createElement('script');t.async=true;t.type ='text/javascript';

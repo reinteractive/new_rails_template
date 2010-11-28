@@ -152,7 +152,7 @@ git :commit => "-a -m 'Setup Database'"
 get "http://code.jquery.com/jquery-latest.min.js", "public/javascripts/jquery.js"
 
 # Downloading latest jQuery drivers
-get "http://github.com/rails/jquery-ujs/raw/master/src/rails.js", "public/javascripts/rails.js"
+get "https://github.com/rails/jquery-ujs/raw/master/src/rails.js", "public/javascripts/rails.js"
 
 # Create a base application.js
 file "public/javascripts/application.js", <<-END

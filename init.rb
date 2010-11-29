@@ -205,7 +205,7 @@ git :commit => "-am 'Installed Sass configuration'"
 run 'rm app/views/layouts/application.html.erb'
 
 file "app/views/layouts/application.html.erb", <<-END
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
     <title><%= @title || "#{app_name.titleize}" %></title>

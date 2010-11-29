@@ -69,20 +69,18 @@ Process
 15. Download the YUI reset css from yui.yahooapis.com
 16. Create the SASS directory and initial ui layout file
 17. Override the stylesheet defaults tag to include reset and the layout file
-18. Create a HAML initializer to default HAML to HTML5
-19. Create a SASS initializer and set to compressed style
-20. Remove application.html.erb and replace with application.haml
-21. Point application.haml at SASS, the javascripts etc
-22. Install RSpec
-23. Install Cucumber
-24. Setup a base file for Machinist and Faker
-25. Create a home controller and map root to it
-27. Setup simple form
-28. Install the country select plugin
-29. Setup devise and ask for the devise model you want to use (defaults to user)
-30. Ask if you want Hoptoad and setup with supplied urchin code
-31. Ask if you want Google Analytics and setup with supplied urchin code
-32. Ask if you want TellThemWhen support and setup with supplied code
+18. Create a SASS initializer and set to compressed style
+19. Update application.html.erb with the basics
+20. Install RSpec
+21. Install Cucumber
+22. Setup a base file for Machinist and Faker
+23. Create a home controller and map root to it
+24. Setup simple form
+25. Install the country select plugin
+26. Setup devise and ask for the devise model you want to use (defaults to user)
+27. Ask if you want Hoptoad and setup with supplied urchin code
+28. Ask if you want Google Analytics and setup with supplied urchin code
+29. Ask if you want TellThemWhen support and setup with supplied code
 
 After each major change it does a git commit as well to keep things tidy :)
 

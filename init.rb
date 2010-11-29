@@ -198,37 +198,31 @@ END
 end
 
 
-initializer('haml.rb') do
-<<-END
-# HAML config
-
-# Use HTML5 by default
-Haml::Template.options[:format] = :html5
-END
-end
-
 git :add => "."
-git :commit => "-am 'Installed HAML and Sass configuration'"
+git :commit => "-am 'Installed Sass configuration'"
 
 # Rewrite application.html.erb to HAML
 run 'rm app/views/layouts/application.html.erb'
 
-file "app/views/layouts/application.haml", <<-END
-!!!
-%html
-  %head
-    %title= @title || "#{app_name.titleize}"
-    = stylesheet_link_tag :defaults
-    = csrf_meta_tag
-  %body
-    = yield
+file "app/views/layouts/application.html.erb", <<-END
+<!doctype html>
+<html>
+  <head>
+    <title><%= @title || "#{app_name.titleize}" %></title>
+    <%= stylesheet_link_tag :defaults %>
+    <%= csrf_meta_tag %>
+  <head>
+  <body>
+    <%= yield %>
     
-    = javascript_include_tag :defaults
-    = yield :bottom_javascript
+    <%= javascript_include_tag :defaults %>
+    <%= yield :bottom_javascript %>
+  </body>
+<html>
 END
 
 git :add => "."
-git :commit => "-am 'Replaced application layout with Haml, including javascripts and default styles'"
+git :commit => "-am 'Updated application.html.erb, including javascripts and default styles'"
 
 
 

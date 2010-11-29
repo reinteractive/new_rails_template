@@ -42,7 +42,7 @@ Usage
 
 To install a fresh rails app, do the following:
 
-    rails new <appname> -m http://github.com/rubyx/rails3_template/raw/master/init.rb
+    rails new <appname> -m https://github.com/rubyx/rails3_template/raw/master/init.rb
 
 While it is installing, go to Google, create a new account for the app and generate an urchin
 code (UA-XXXXXX-XX) and make a note of this.  Also go to Hoptoad and create a project for this

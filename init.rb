@@ -1,6 +1,6 @@
 # RubyX Standard Init Script for Rails 3
 
-RailsVersion = "3.0.1"
+RailsVersion = "3.0.3"
 
 instructions =<<-END
 
@@ -170,7 +170,7 @@ git :add => "."
 git :commit => "-a -m 'Installed JQuery'"
 
 ############################################################
-# Install Reset CSS, SASS and HAML
+# Install Reset CSS, SASS
 #
 
 # Download reset.css
@@ -224,6 +224,13 @@ END
 git :add => "."
 git :commit => "-am 'Updated application.html.erb, including javascripts and default styles'"
 
+
+############################################################
+# Remove test folder
+#
+
+git :rm => "-rf test"
+git :commit => "-am 'Removing test folder'"
 
 
 ############################################################

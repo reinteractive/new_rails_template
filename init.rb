@@ -8,8 +8,8 @@ Running the RubyX Standard Init Script for Rails 3
 --------------------------------------------------
 
 During installation you will be asked for a number
-of credentials for different services, these are 
-entirely optional however you might like to gather 
+of credentials for different services, these are
+entirely optional however you might like to gather
 these now.
 
 - Hoptoad API key
@@ -72,7 +72,7 @@ gem "devise",                 "~> 1.1.3"
 gem "simple_form",            "~> 1.2.2"
 gem "paperclip",              "~> 2.3.4"
 gem "aws-s3",                 "~> 0.6.2", :require => 'aws/s3'
-    
+
 group :test do
   gem 'capybara',             "~> 0.3.9"
   gem "capybara-envjs",       "~> 0.1.6"
@@ -214,7 +214,7 @@ file "app/views/layouts/application.html.erb", <<-END
   <head>
   <body>
     <%= yield %>
-    
+
     <%= javascript_include_tag :defaults %>
     <%= yield :bottom_javascript %>
   </body>

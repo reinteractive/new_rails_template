@@ -38,10 +38,11 @@ git :add => "README.md"
 git :commit => "-m 'Fix up the README'"
 
 # Improve the Gitignore
-append_file ".gitignore", "config/database.yml"
-append_file ".gitignore", "config/.rvmrc"
-append_file ".gitignore", ".rspec"
-append_file ".gitignore", "vendor/bundle"
+append_file ".gitignore", "\nconfig/database.yml"
+append_file ".gitignore", "\n.rvmrc"
+append_file ".gitignore", "\n.rspec"
+append_file ".gitignore", "\nvendor/bundle"
+append_file ".gitignore", "\n.DS_Store"
 
 git :add => ".gitignore"
 git :commit => "-m 'Ignore what we need to ignore'"
@@ -183,7 +184,7 @@ run 'touch public/stylesheets/sass/ui.layout.scss'
 # Override stylesheet_link_tag :defaults
 environment "  config.action_view.stylesheet_expansions[:defaults] = ['reset', 'ui.layout']"
 
-# HAML & Sass config initializer
+# Sass config initializer
 initializer('sass.rb') do
 <<-END
 # SASS config
@@ -201,7 +202,7 @@ end
 git :add => "."
 git :commit => "-am 'Installed Sass configuration'"
 
-# Rewrite application.html.erb to HAML
+# Clean up layout
 run 'rm app/views/layouts/application.html.erb'
 
 file "app/views/layouts/application.html.erb", <<-END
@@ -273,8 +274,8 @@ git :commit => "-a -m 'Installed RSpec, Cucumber and Machinist'"
 generate 'controller', 'home'
 route("root :to => 'home#index'")
 
-file 'app/views/home/index.haml', <<-END
-%h1 Home
+file 'app/views/home/index.html.erb', <<-END
+<h1>Home</h1>
 END
 
 git :add => "."
@@ -293,15 +294,18 @@ git :add => "."
 git :commit => "-a -m 'Installed Simple Form'"
 
 # Setup Devise
-generate "devise:install"
-model_name = ask("What model name should devise use? (default: user)?")
-model_name = 'user' if model_name.blank?
-generate "devise", model_name
-generate 'devise:views'
+if ask("Setup Devise? (N/y)").upcase == 'Y'
+  generate "devise:install"
+  model_name = ask("What model name should devise use? (default: user)?")
+  model_name = 'user' if model_name.blank?
+  generate "devise", model_name
+  generate 'devise:views'
 
-git :add => "."
-git :commit => "-a -m 'Setup devise'"
-
+  git :add => "."
+  git :commit => "-a -m 'Setup devise'"
+else
+  say "=> Skipping Devise setup"
+end
 
 ############################################################
 # Setup Hoptoad and Google Analytics
@@ -320,8 +324,8 @@ end
 # Setup Google Analytics
 if ask("Add Google Analytics tracking to layout? (N/y)").upcase == 'Y'
   ga_key = ask("Please provide your Google Analytics tracking key: (e.g UA-XXXXXX-XX)")
-file "app/views/shared/_google_analytics.haml", <<-LOL
-:javascript
+file "app/views/shared/_google_analytics.html.erb", <<-CODE
+<script type="text/javascript" charset="utf-8">
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', '#{ga_key}']);
   _gaq.push(['_trackPageview']);
@@ -331,11 +335,12 @@ file "app/views/shared/_google_analytics.haml", <<-LOL
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
-LOL
+</script>
+CODE
 
-append_file "app/views/layouts/application.haml", <<-LOL
-    = render :partial => 'shared/google_analytics'
-LOL
+append_file "app/views/layouts/application.html.erb", <<-CODE
+<%= render :partial => 'shared/google_analytics' %>
+CODE
   git :add => "."
   git :commit => "-am 'Added Google Analytics tracking code'"
 else
@@ -345,19 +350,20 @@ end
 # Setup TellThemWhen site support
 if ask("Add TellThemWhen Site Notification code to layout? (N/y)").upcase == 'Y'
   tellthemwhenkey = ask("Please provide your TellThemWhen tracking key: (e.g 1a2b3c4d5e6f)")
-file "app/views/shared/_tellthemwhen.haml", <<-LOL
-#TTWNotify{:style=>"display:none"}
-:javascript
+file "app/views/shared/_tellthemwhen.html.erb", <<-CODE
+<div id="TTWNotify" style="display:none;"></div>
+<script type="text/javascript" charset="utf-8">
   (function(){
     t = document.createElement('script');t.async=true;t.type ='text/javascript';
     t.src = ('https:' == document.location.protocol ? 'https://secure.' : 'http://api.') + 'tellthemwhen.com/api/v2/notices/#{tellthemwhenkey}.js';
     var s=document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(t,s);
   })();
-LOL
+</script>
+CODE
 
-append_file "app/views/layouts/application.haml", <<-LOL
-    = render :partial => 'shared/tellthemwhen'
-LOL
+append_file "app/views/layouts/application.html.erb", <<-CODE
+<%= render :partial => 'shared/tellthemwhen' %>
+CODE
   git :add => "."
   git :commit => "-am 'Added TellThemWhen Site Notification code'"
 else

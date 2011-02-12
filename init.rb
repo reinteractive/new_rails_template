@@ -1,6 +1,6 @@
 # RubyX Standard Init Script for Rails 3
 
-RailsVersion = "3.0.3"
+RailsVersion = "3.0.4"
 
 instructions =<<-END
 

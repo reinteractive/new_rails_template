@@ -66,26 +66,26 @@ file "Gemfile", <<-END
 source :rubygems
 
 gem "rails",                  "#{RailsVersion}"
-gem "pg",                     "~> 0.9.0"
-gem "haml",                   "~> 3.0.22"
-gem "hoptoad_notifier",       "~> 2.3.8"
-gem "devise",                 "~> 1.1.3"
-gem "simple_form",            "~> 1.2.2"
-gem "paperclip",              "~> 2.3.4"
-gem "aws-s3",                 "~> 0.6.2", :require => 'aws/s3'
+gem "pg"
+gem "haml"
+gem "hoptoad_notifier"
+gem "devise"
+gem "simple_form"
+gem "paperclip"
+gem "aws-s3",                 :require => 'aws/s3'
 
-group :test do
-  gem 'capybara',             "~> 0.3.9"
-  gem "capybara-envjs",       "~> 0.1.6"
-  gem 'database_cleaner',     "~> 0.5.2"
-  gem "cucumber-rails",       "~> 0.3.2"
-  gem "rspec-rails",          "~> 2.0.0"
-  gem "launchy",              "~> 0.3.7"
-  gem "selenium-webdriver",   "~> 0.0.29"
-  gem "autotest-rails",       "~> 4.1.0"
-  gem "shoulda",              "~> 2.11.3"
-  gem "machinist",            "~> 1.0.6"
-  gem "faker",                "~> 0.3.1"
+group :development, :test do
+  gem 'capybara'
+  gem "capybara-envjs"
+  gem 'database_cleaner'
+  gem "cucumber-rails"
+  gem "rspec-rails"
+  gem "launchy"
+  gem "selenium-webdriver"
+  gem "autotest-rails"
+  gem "shoulda"
+  gem "machinist"
+  gem "faker"
   gem "ruby-debug"
 end
 END

@@ -1,6 +1,6 @@
 # RubyX Standard Init Script for Rails 3
 
-RailsVersion = "3.0.4"
+RailsVersion = "3.0.6"
 
 instructions =<<-END
 
@@ -58,7 +58,6 @@ run 'rm -f public/javascripts/*'
 git :add => "."
 git :commit => "-a -m 'Initial commit of clean Rails #{RailsVersion} App'"
 
-
 ############################################################
 # Setup Gemfile and RVM
 #
@@ -67,12 +66,13 @@ source :rubygems
 
 gem "rails",                  "#{RailsVersion}"
 gem "pg"
-gem "haml"
+gem "sass"
 gem "hoptoad_notifier"
 gem "devise"
 gem "simple_form"
-gem "paperclip"
-gem "aws-s3",                 :require => 'aws/s3'
+gem "jquery-rails"
+gem 'unicorn'
+gem "app"
 
 group :development, :test do
   gem 'capybara'
@@ -86,13 +86,13 @@ group :development, :test do
   gem "shoulda"
   gem "machinist"
   gem "faker"
-  gem "ruby-debug"
+  gem 'ruby-debug'
 end
 END
 
 # Setup RVM RC and trust it
 file ".rvmrc", <<-END
-rvm ruby-1.8.7@#{app_name}
+rvm ruby-1.8.7
 END
 run "rvm rvmrc trust"
 
@@ -111,11 +111,11 @@ git :commit => "-a -m 'Gemset created and bundle installed'"
 # Remove default database file
 run 'rm config/database.yml'
 
-# Use the only real database :)
+# Use the only real database with database swapping per branch
 file "config/database.yml", <<-END
 development: &DEVELOPMENT
   adapter: postgresql
-  database: #{app_name}_development
+  database: #{app_name}_development_<%= `git symbolic-ref HEAD 2>/dev/null`.chomp.sub('refs/heads/', '').gsub(/\W/,'_') %>
   encoding: unicode
   pool: 15
   username: postgres
@@ -123,7 +123,7 @@ development: &DEVELOPMENT
 
 test: &TEST
   adapter: postgresql
-  database: #{app_name}_test
+  database: #{app_name}_test_<%= `git symbolic-ref HEAD 2>/dev/null`.chomp.sub('refs/heads/', '').gsub(/\W/,'_') %>
   encoding: unicode
   pool: 15
   username: postgres
@@ -144,28 +144,18 @@ rake("db:create")
 git :add => "."
 git :commit => "-a -m 'Setup Database'"
 
+############################################################
+# Install App Config
+#
+generate "configurable"
+
+git :add => "."
+git :commit => "-a -m 'Setup App Configurable'"
 
 ############################################################
 # Install JQuery
 #
-
-# Downloading latest jQuery.min
-get "http://code.jquery.com/jquery-latest.min.js", "public/javascripts/jquery.js"
-
-# Downloading latest jQuery drivers
-get "https://github.com/rails/jquery-ujs/raw/master/src/rails.js", "public/javascripts/rails.js"
-
-# Create a base application.js
-file "public/javascripts/application.js", <<-END
-jQuery(function ($) {
-  /**
-   * App code in here
-   */
-};
-END
-
-# Override javascript_link_tag :defaults
-environment "  config.action_view.javascript_expansions[:defaults] = ['jquery', 'rails']"
+generate "jquery:install --ui"
 
 git :add => "."
 git :commit => "-a -m 'Installed JQuery'"
@@ -179,25 +169,20 @@ get 'http://yui.yahooapis.com/2.8.1/build/reset/reset-min.css', 'public/styleshe
 
 # Create the SASS directory
 run 'mkdir public/stylesheets/sass'
-run 'touch public/stylesheets/sass/ui.layout.scss'
+run 'touch public/stylesheets/sass/layout.scss'
 
 # Override stylesheet_link_tag :defaults
-environment "  config.action_view.stylesheet_expansions[:defaults] = ['reset', 'ui.layout']"
+environment "  config.action_view.stylesheet_expansions[:defaults] = ['reset', 'layout']"
 
 # Sass config initializer
 initializer('sass.rb') do
 <<-END
 # SASS config
-
-# Compress output CSS
 Sass::Plugin.options[:style] = :compressed
-
-# Look in sub folders for Sass files
 Sass::Plugin.options[:template_location] = {}
-Dir.glob("\#\{Rails.root\}/public/stylesheets/**/sass").each { |dir| Sass::Plugin.options[:template_location].merge!({dir => dir.to_s.split('/sass')[0]}) }
+Dir.glob("\#{Rails.root}/public/stylesheets/**/sass").each { |dir| Sass::Plugin.options[:template_location].merge!({dir => dir.to_s.split('/sass')[0]}) }
 END
 end
-
 
 git :add => "."
 git :commit => "-am 'Installed Sass configuration'"
@@ -213,11 +198,14 @@ file "app/views/layouts/application.html.erb", <<-END
     <%= stylesheet_link_tag :defaults %>
     <%= csrf_meta_tag %>
   <head>
-  <body>
-    <%= yield %>
+  <body class="<%= controller.controller_name %>">
+    <div id="Content">
+      <%= yield %>
+    </div>
 
+    <%= yield :before_javascript %>
     <%= javascript_include_tag :defaults %>
-    <%= yield :bottom_javascript %>
+    <%= yield :after_javascript %>
   </body>
 <html>
 END
@@ -322,12 +310,16 @@ else
 end
 
 # Setup Google Analytics
-if ask("Add Google Analytics tracking to layout? (N/y)").upcase == 'Y'
+if ask("Do you have Google Analytics key? (N/y)").upcase == 'Y'
   ga_key = ask("Please provide your Google Analytics tracking key: (e.g UA-XXXXXX-XX)")
+else
+  ga_key = nil
+end
+
 file "app/views/shared/_google_analytics.html.erb", <<-CODE
 <script type="text/javascript" charset="utf-8">
   var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', '#{ga_key}']);
+  _gaq.push(['_setAccount', '#{ga_key || "INSERT-URCHIN-CODE"}']);
   _gaq.push(['_trackPageview']);
 
   (function() {
@@ -338,37 +330,49 @@ file "app/views/shared/_google_analytics.html.erb", <<-CODE
 </script>
 CODE
 
+if ga_key
 append_file "app/views/layouts/application.html.erb", <<-CODE
 <%= render :partial => 'shared/google_analytics' %>
 CODE
-  git :add => "."
-  git :commit => "-am 'Added Google Analytics tracking code'"
 else
-  say "=> Skipping Google Analytics setup"
+append_file "app/views/layouts/application.html.erb", <<-CODE
+<%#= render :partial => 'shared/google_analytics' %>
+CODE
 end
 
+git :add => "."
+git :commit => "-am 'Added Google Analytics tracking code'"
+
 # Setup TellThemWhen site support
-if ask("Add TellThemWhen Site Notification code to layout? (N/y)").upcase == 'Y'
+if ask("Do you have a TellThemWhen Site Notification key? (N/y)").upcase == 'Y'
   tellthemwhenkey = ask("Please provide your TellThemWhen tracking key: (e.g 1a2b3c4d5e6f)")
+else
+  tellthemwhenkey = nil
+end
+
 file "app/views/shared/_tellthemwhen.html.erb", <<-CODE
 <div id="TTWNotify" style="display:none;"></div>
 <script type="text/javascript" charset="utf-8">
   (function(){
     t = document.createElement('script');t.async=true;t.type ='text/javascript';
-    t.src = ('https:' == document.location.protocol ? 'https://secure.' : 'http://api.') + 'tellthemwhen.com/api/v2/notices/#{tellthemwhenkey}.js';
+    t.src = ('https:' == document.location.protocol ? 'https://secure.' : 'http://api.') + 'tellthemwhen.com/api/v2/notices/#{tellthemwhenkey || "INSERT-TELLTHEMWHE-KEY"}.js';
     var s=document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(t,s);
   })();
 </script>
 CODE
 
+if tellthemwhenkey
 append_file "app/views/layouts/application.html.erb", <<-CODE
 <%= render :partial => 'shared/tellthemwhen' %>
 CODE
-  git :add => "."
-  git :commit => "-am 'Added TellThemWhen Site Notification code'"
 else
-  say "=> Skipping TellThemWhen setup"
+append_file "app/views/layouts/application.html.erb", <<-CODE
+<%#= render :partial => 'shared/tellthemwhen' %>
+CODE
 end
+
+git :add => "."
+git :commit => "-am 'Added TellThemWhen Site Notification code'"
 
 
 instructions =<<-END

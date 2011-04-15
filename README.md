@@ -8,7 +8,8 @@ Assumptions
 
 This initialisation script assumes a few things:
 
-* The latest version of Rails (currently 3.0.1)
+* Ruby 1.8.7
+* The latest version of Rails (currently 3.0.6)
 * PostgreSQL for your database
 * JQuery, Simple Form, HTML for views and SASS for stylesheets
 * Devise for authentication

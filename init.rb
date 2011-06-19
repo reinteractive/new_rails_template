@@ -1,6 +1,6 @@
 # RubyX Standard Init Script for Rails 3
 
-RailsVersion = "3.0.6"
+RailsVersion = "3.0.9"
 
 instructions =<<-END
 
@@ -16,6 +16,8 @@ these now.
 - Google Analytics tracking code e.g UA-XXXXXX-XX
   This can be found on your Google Analytics settings page.
 - TellThemWhen.com Site API key
+
+We are installing Rails #{RailsVersion} on Ruby #{RUBY_VERSION}
 
 --------------------------------------------------
 END
@@ -37,15 +39,26 @@ git :init
 git :add => "README.md"
 git :commit => "-m 'Fix up the README'"
 
+# Setup RVM RC and trust it
+file ".rvmrc", <<-END
+rvm ruby-#{RUBY_VERSION}@#{app_name.titleize} --create
+END
+run "rvm rvmrc trust"
+
+# Change to the new RVM gemset
+run "rvm ruby-#{RUBY_VERSION}@#{app_name.titleize} --create"
+
+git :add => ".rvmrc -f"
+git :commit => ".rvmrc -m 'Adding explicit RVMRC'"
+
 # Improve the Gitignore
 append_file ".gitignore", "\nconfig/database.yml"
-append_file ".gitignore", "\n.rvmrc"
 append_file ".gitignore", "\n.rspec"
 append_file ".gitignore", "\nvendor/bundle"
 append_file ".gitignore", "\n.DS_Store"
 
 git :add => ".gitignore"
-git :commit => "-m 'Ignore what we need to ignore'"
+git :commit => ".gitignore -m 'Ignore what we need to ignore'"
 
 # Remove the other static files
 run 'rm Gemfile'
@@ -75,26 +88,17 @@ gem 'unicorn'
 gem "app"
 
 group :development, :test do
-  gem 'capybara'
-  gem "capybara-envjs"
-  gem 'database_cleaner'
-  gem "cucumber-rails"
   gem "rspec-rails"
+  gem 'capybara'
+  gem 'database_cleaner'
   gem "launchy"
-  gem "selenium-webdriver"
+  gem "cucumber-rails"
   gem "autotest-rails"
   gem "shoulda"
   gem "machinist"
   gem "faker"
-  gem 'ruby-debug'
 end
 END
-
-# Setup RVM RC and trust it
-file ".rvmrc", <<-END
-rvm ruby-1.8.7
-END
-run "rvm rvmrc trust"
 
 # Bundle install
 run "gem install bundler"

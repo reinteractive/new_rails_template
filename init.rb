@@ -236,7 +236,7 @@ generate "cucumber:install", "--rspec --capybara"
 
 # Setup Machinist and Faker
 run 'mkdir -p spec/support'
-file 'touch spec/support/blueprints.rb', <<-END
+file 'spec/support/blueprints.rb', <<-END
 require 'machinist/active_record'
 require 'faker'
 require 'sham'
@@ -249,7 +249,7 @@ Sham.text  { Faker::Lorem.sentence }
 END
 
 # doing { something }.should change(Something, :count).by(1)
-file 'touch spec/support/custom.rb', <<-END
+file 'spec/support/custom.rb', <<-END
 alias :doing :lambda
 END
 

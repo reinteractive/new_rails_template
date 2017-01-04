@@ -1,54 +1,46 @@
 About
 =====
 
-This is the RubyX Rails 3 Template we use to kick off any new application.
+This is the reinteractive Rails 5 Template we use to kick off any new application.
 
 Assumptions
 ---------------
 
 This initialisation script assumes a few things:
 
-* Ruby 1.8.7
-* The latest version of Rails (currently 3.0.6)
+* Ruby 2.3.1
+* The latest version of Rails (currently 5.0.1)
 * PostgreSQL for your database
 * JQuery, Simple Form, HTML for views and SASS for stylesheets
 * Devise for authentication
-* Cucumber with Selenium and Capybara
-* RSpec with Machinist and Faker
+* RSpec with FactoryGirl and Faker
 * Google analytics (optional)
-* Hoptoad for issue tracking (optional)
-* TellThemWhen for downtime notifications (optional)
 
 
 Pre Initialisation Setup with RVM
 ---------------------------------
 
-All RubyX app is developed using RVM and app specific Gemsets, so you need make sure you have bundler
-installed in your global gemset, this saves installing it every single time:
+If you are using RVM, doing the following should get you ready to use this script.
 
-    rvm gemset use 'global'
+    rvm install ruby-2.3.1
+    rvm gemset create <appname>
+    rvm gemset use <appname>
     gem install bundler
-
-Once done, create a gemset for your app and use it:
-
-    rvm gemset create 'appname'
-    rvm gemset use 'appname'
 
 Now we have a gemset, install rails:
 
-    gem install rails --no-rdoc --no-ri
+    gem install rails -v 5.0.1 --no-rdoc --no-ri
 
 Usage
 ----------------------------------
 
 To install a fresh rails app, do the following:
 
-    rails new <appname> -m https://github.com/rubyx/rails3_template/raw/master/init.rb
+    rails new <appname> -m https://github.com/reinteractive/new_rails_template/raw/rails-5-0-1/init.rb
 
 While it is installing, go to Google, create a new account for the app and generate an urchin
-code (UA-XXXXXX-XX) and make a note of this.  Also go to Hoptoad and create a project for this
-app and get the Hoptoad API key (abcdef1234567890abcdef1234567890), you will be asked for
-these as the script installs.
+code (UA-XXXXXX-XX) and make a note of this.  Also get a project code for this app for Bugsnag
+and get the API key.
 
 Process
 ---------------
@@ -57,45 +49,44 @@ Process
 2. Update the .gitignore file
 3. Remove the stock Rails Gemfile and public static asset including prototype
 4. Install a Gemfile with all gem requirements
-5. Setup an .rvmrc for this app and trust it
-6. Install all gems into the gemset
-7. Replace database.yml with a PostgreSQL one
-8. Copy this to database.example.yml
-9. Set the app time zone to explicitly UTC
-10. Create the database
-11. Download JQuery latest from code.jquery.com
-12. Download the latest Rails jQuery driver from github.com/rails/jquery-ujs
-13. Setup a application.js with the jQuery document ready function
-14. Change the defaults for javascript include tag help to include jQuery
-15. Download the YUI reset css from yui.yahooapis.com
-16. Create the SASS directory and initial ui layout file
-17. Override the stylesheet defaults tag to include reset and the layout file
-18. Create a SASS initializer and set to compressed style
-19. Update application.html.erb with the basics
-20. Install RSpec
-21. Install Cucumber
-22. Setup a base file for Machinist and Faker
+5. Setup an .ruby-version for this app
+6. Setup an .ruby-gemset for this app
+7. Install all gems into the gemset
+8. Replace database.yml with a PostgreSQL one
+9. Copy this to database.example.yml
+10. Set the app time zone to explicitly UTC
+11. Create the database
+12. Download JQuery latest from code.jquery.com
+13. Download the latest Rails jQuery driver from github.com/rails/jquery-ujs
+14. Setup a application.js with the jQuery document ready function
+15. Change the defaults for javascript include tag help to include jQuery
+16. Download the YUI reset css from yui.yahooapis.com
+17. Create the SASS directory and initial ui layout file
+18. Override the stylesheet defaults tag to include reset and the layout file
+19. Create a SASS initializer and set to compressed style
+20. Update application.html.erb with the basics
+21. Install RSpec
+22. Setup a base file for FactoryGirl and Faker
 23. Create a home controller and map root to it
 24. Setup simple form
 25. Install the country select plugin
 26. Setup devise and ask for the devise model you want to use (defaults to user)
-27. Ask if you want Hoptoad and setup with supplied urchin code
+27. Ask if you want Bugsnag and setup with supplied urchin code
 28. Ask if you want Google Analytics and setup with supplied urchin code
-29. Ask if you want TellThemWhen support and setup with supplied code
 
 After each major change it does a git commit as well to keep things tidy :)
 
 Credits
 =======
 
-This is created from our work at RubyX, thanks also to Ivan Vanderbyl from Asterism for several patches.
+This is created from our work at reinteractive.
 
 License
 =======
 
 (The MIT License)
 
-Copyright (c) 2010
+Copyright (c) 2016
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

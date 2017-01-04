@@ -1,10 +1,10 @@
 # RubyX Standard Init Script for Rails 3
 
-RailsVersion = "3.0.9"
+RailsVersion = "5.0.1"
 
 instructions =<<-END
 
-Running the RubyX Standard Init Script for Rails 3
+Running the reinteractive Init Script for Rails #{RailsVersion}
 --------------------------------------------------
 
 During installation you will be asked for a number
@@ -12,10 +12,9 @@ of credentials for different services, these are
 entirely optional however you might like to gather
 these now.
 
-- Hoptoad API key
+- Bugsnag API key
 - Google Analytics tracking code e.g UA-XXXXXX-XX
   This can be found on your Google Analytics settings page.
-- TellThemWhen.com Site API key
 
 We are installing Rails #{RailsVersion} on Ruby #{RUBY_VERSION}
 
@@ -88,15 +87,23 @@ gem 'unicorn'
 gem "app"
 
 group :development, :test do
-  gem "rspec-rails"
+  gem 'i18n-tasks'
+  gem 'webmock'
+  gem 'fuubar'
+  gem 'foreman'
+  gem 'rspec-rails'
   gem 'capybara'
+  gem 'factory_girl_rails'
+  gem 'shoulda-matchers'
+  gem 'pry-rails'
+  gem 'ffaker'
+  gem 'timecop'
+  # Ensure clean database after each test run
   gem 'database_cleaner'
-  gem "launchy"
-  gem "cucumber-rails"
-  gem "autotest-rails"
-  gem "shoulda"
-  gem "machinist"
-  gem "faker"
+  gem 'launchy'
+  gem 'poltergeist'
+  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+  gem 'byebug'
 end
 END
 
@@ -300,17 +307,17 @@ else
 end
 
 ############################################################
-# Setup Hoptoad and Google Analytics
+# Setup Bugsnag and Google Analytics
 #
 
-# Setup HopToad
-if ask("Setup Hoptoad? (N/y)").upcase == 'Y'
+# Setup Bugsnag
+if ask("Setup Bugsnag? (N/y)").upcase == 'Y'
   hop_toad_key = ask("Please provide HopToad API Key:")
-  generate "hoptoad", "--api-key #{hop_toad_key}"
+  generate "bugsnag", "--api-key #{hop_toad_key}"
   git :add => "."
-  git :commit => "-a -m 'Installed HopToad'"
+  git :commit => "-a -m 'Installed Bugsnag'"
 else
-  say "=> Skipping HopToad setup"
+  say "=> Skipping Bugsnag setup"
 end
 
 # Setup Google Analytics
@@ -346,37 +353,6 @@ end
 
 git :add => "."
 git :commit => "-am 'Added Google Analytics tracking code'"
-
-# Setup TellThemWhen site support
-if ask("Do you have a TellThemWhen Site Notification key? (N/y)").upcase == 'Y'
-  tellthemwhenkey = ask("Please provide your TellThemWhen tracking key: (e.g 1a2b3c4d5e6f)")
-else
-  tellthemwhenkey = nil
-end
-
-file "app/views/shared/_tellthemwhen.html.erb", <<-CODE
-<div id="TTWNotify" style="display:none;"></div>
-<script type="text/javascript" charset="utf-8">
-  (function(){
-    t = document.createElement('script');t.async=true;t.type ='text/javascript';
-    t.src = ('https:' == document.location.protocol ? 'https://secure.' : 'http://api.') + 'tellthemwhen.com/api/v2/notices/#{tellthemwhenkey || "INSERT-TELLTHEMWHE-KEY"}.js';
-    var s=document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(t,s);
-  })();
-</script>
-CODE
-
-if tellthemwhenkey
-append_file "app/views/layouts/application.html.erb", <<-CODE
-<%= render :partial => 'shared/tellthemwhen' %>
-CODE
-else
-append_file "app/views/layouts/application.html.erb", <<-CODE
-<%#= render :partial => 'shared/tellthemwhen' %>
-CODE
-end
-
-git :add => "."
-git :commit => "-am 'Added TellThemWhen Site Notification code'"
 
 
 instructions =<<-END

@@ -124,24 +124,19 @@ run 'rm config/database.yml'
 
 # Use the only real database with database swapping per branch
 file "config/database.yml", <<-END
-development: &DEVELOPMENT
+default: &default
   adapter: postgresql
-  database: #{app_name}_development_<%= `git symbolic-ref HEAD 2>/dev/null`.chomp.sub('refs/heads/', '').gsub(/\W/,'_') %>
-  encoding: unicode
-  pool: 15
-  username: postgres
-  password:
 
-test: &TEST
-  adapter: postgresql
-  database: #{app_name}_test_<%= `git symbolic-ref HEAD 2>/dev/null`.chomp.sub('refs/heads/', '').gsub(/\W/,'_') %>
-  encoding: unicode
-  pool: 15
-  username: postgres
-  password:
+development:
+  <<: *default
+  database: #{app_name}_development
 
-cucumber:
-  <<: *TEST
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  <<: *default
+  database: #{app_name}_test
 END
 
 environment "  config.time_zone = 'UTC'"
